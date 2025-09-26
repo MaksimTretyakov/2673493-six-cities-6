@@ -1,7 +1,7 @@
 # Личный проект «Шесть городов»
 
-* Студент: [Максим Третьяков](https://up.htmlacademy.ru/univer-js3/6/user/2673493).
-* Наставник: `Неизвестно`.
+- Студент: [Максим Третьяков](https://up.htmlacademy.ru/univer-js3/6/user/2673493).
+- Наставник: [Максим Боровик](https://htmlacademy.ru/profile/id1025673)
 
 ---
 
