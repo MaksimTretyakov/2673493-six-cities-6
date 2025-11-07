@@ -1,11 +1,13 @@
-import Card from '../../components/card/card';
 import { Link } from 'react-router-dom';
+import CardList from '../../components/card-list/card-list';
+import { Offer } from '../../types/offer';
 
 type MainPageProps = {
-  placesCount: number;
+  offers: Offer[];
 };
 
-function MainPage({ placesCount }: MainPageProps): JSX.Element {
+function MainPage({ offers }: MainPageProps): JSX.Element {
+  const placesCount = offers.length;
   return (
     <div className="page page--gray page--main">
       <header className="header">
@@ -124,13 +126,7 @@ function MainPage({ placesCount }: MainPageProps): JSX.Element {
                   </li>
                 </ul>
               </form>
-              <div className="cities__places-list places__list tabs__content">
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-              </div>
+              <CardList offers={offers} />
             </section>
             <div className="cities__right-section">
               <section className="cities__map map"></section>
