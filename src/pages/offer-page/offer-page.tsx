@@ -5,6 +5,7 @@ import { offers } from '../../mocks/offers';
 function OfferPage(): JSX.Element {
   const { id } = useParams();
   const offer = offers.find((o) => o.id === id);
+  const favoriteCount = offers.filter((o) => o.isFavorite).length;
 
   if (!offer) {
     return <Navigate to="/404" />;
@@ -34,7 +35,7 @@ function OfferPage(): JSX.Element {
               <Link className="header__logo-link" to="/">
                 <img
                   className="header__logo"
-                  src="/img/logo.svg"
+                  src="img/logo.svg"
                   alt="6 cities logo"
                   width="81"
                   height="41"
@@ -52,7 +53,9 @@ function OfferPage(): JSX.Element {
                     <span className="header__user-name user__name">
                       Oliver.conner@gmail.com
                     </span>
-                    <span className="header__favorite-count">3</span>
+                    <span className="header__favorite-count">
+                      {favoriteCount}
+                    </span>
                   </Link>
                 </li>
                 <li className="header__nav-item">
@@ -72,11 +75,7 @@ function OfferPage(): JSX.Element {
             <div className="offer__gallery">
               {images.slice(0, 6).map((imageSrc) => (
                 <div key={imageSrc} className="offer__image-wrapper">
-                  <img
-                    className="offer__image"
-                    src={`/${imageSrc}`}
-                    alt={title}
-                  />
+                  <img className="offer__image" src={imageSrc} alt={title} />
                 </div>
               ))}
             </div>
@@ -146,7 +145,7 @@ function OfferPage(): JSX.Element {
                   >
                     <img
                       className="offer__avatar user__avatar"
-                      src={`/${host.avatarUrl}`}
+                      src={host.avatarUrl}
                       width="74"
                       height="74"
                       alt="Host avatar"
@@ -171,7 +170,7 @@ function OfferPage(): JSX.Element {
                       <div className="reviews__avatar-wrapper user__avatar-wrapper">
                         <img
                           className="reviews__avatar user__avatar"
-                          src="/img/avatar-max.jpg"
+                          src="img/avatar-max.jpg"
                           width="54"
                           height="54"
                           alt="Reviews avatar"
@@ -214,7 +213,7 @@ function OfferPage(): JSX.Element {
                   <Link to="/">
                     <img
                       className="place-card__image"
-                      src="/img/room.jpg"
+                      src="img/room.jpg"
                       width="260"
                       height="200"
                       alt="Place image"
