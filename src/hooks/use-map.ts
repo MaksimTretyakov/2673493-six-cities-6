@@ -28,11 +28,22 @@ function useMap(
       );
 
       instance.addLayer(layer);
-
       setMap(instance);
       isRenderedRef.current = true;
     }
   }, [mapRef, city]);
+
+  useEffect(() => {
+    if (map) {
+      map.setView(
+        {
+          lat: city.location.latitude,
+          lng: city.location.longitude,
+        },
+        city.location.zoom
+      );
+    }
+  }, [map, city]);
 
   return map;
 }
