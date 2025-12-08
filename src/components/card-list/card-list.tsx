@@ -3,14 +3,26 @@ import { Offer } from '../../types/offer';
 
 type CardListProps = {
   offers: Offer[];
-  onCardHover: (offerId: string | null) => void;
+  onCardHover?: (offerId: string | null) => void;
+  listClassName?: string;
+  cardClassNamePrefix?: 'cities' | 'near-places';
 };
 
-function CardList({ offers, onCardHover }: CardListProps): JSX.Element {
+function CardList({
+  offers,
+  onCardHover,
+  listClassName = 'cities__places-list places__list tabs__content',
+  cardClassNamePrefix = 'cities',
+}: CardListProps): JSX.Element {
   return (
-    <div className="cities__places-list places__list tabs__content">
+    <div className={listClassName}>
       {offers.map((offer) => (
-        <Card key={offer.id} offer={offer} onCardHover={onCardHover} />
+        <Card
+          key={offer.id}
+          offer={offer}
+          onCardHover={onCardHover}
+          classNamePrefix={cardClassNamePrefix}
+        />
       ))}
     </div>
   );
