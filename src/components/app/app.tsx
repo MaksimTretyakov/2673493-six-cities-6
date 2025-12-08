@@ -10,6 +10,7 @@ import { RootState } from '../../store';
 import Spinner from '../spinner/spinner';
 import React, { useEffect } from 'react';
 import { setError } from '../../store/action';
+import { AuthorizationStatus } from '../../consts';
 
 const ERROR_TIMEOUT = 5000;
 
@@ -47,12 +48,17 @@ function ErrorMessage(): JSX.Element | null {
 }
 
 function App(): JSX.Element {
-  const authorizationStatus = false;
+  const authorizationStatus = useSelector(
+    (state: RootState) => state.authorizationStatus
+  );
   const isOffersDataLoading = useSelector(
     (state: RootState) => state.isOffersDataLoading
   );
 
-  if (isOffersDataLoading) {
+  if (
+    authorizationStatus === AuthorizationStatus.Unknown ||
+    isOffersDataLoading
+  ) {
     return <Spinner />;
   }
 
@@ -65,7 +71,7 @@ function App(): JSX.Element {
         <Route
           path="/favorites"
           element={
-            <PrivateRoute authorizationStatus={authorizationStatus}>
+            <PrivateRoute>
               <FavoritesPage />
             </PrivateRoute>
           }
