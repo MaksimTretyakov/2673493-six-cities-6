@@ -4,9 +4,14 @@ import { Offer } from '../../types/offer';
 type CardProps = {
   offer: Offer;
   onCardHover?: (offerId: string | null) => void;
+  classNamePrefix?: 'cities' | 'near-places';
 };
 
-function Card({ offer, onCardHover }: CardProps): JSX.Element {
+function Card({
+  offer,
+  onCardHover,
+  classNamePrefix = 'cities',
+}: CardProps): JSX.Element {
   const {
     id,
     title,
@@ -28,7 +33,7 @@ function Card({ offer, onCardHover }: CardProps): JSX.Element {
 
   return (
     <article
-      className="cities__card place-card"
+      className={`${classNamePrefix}__card place-card`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -37,7 +42,9 @@ function Card({ offer, onCardHover }: CardProps): JSX.Element {
           <span>Premium</span>
         </div>
       )}
-      <div className="cities__image-wrapper place-card__image-wrapper">
+      <div
+        className={`${classNamePrefix}__image-wrapper place-card__image-wrapper`}
+      >
         <Link to={`/offer/${id}`}>
           <img
             className="place-card__image"

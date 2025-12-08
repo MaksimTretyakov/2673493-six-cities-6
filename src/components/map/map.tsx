@@ -9,6 +9,7 @@ type MapProps = {
   city: City;
   offers: Offer[];
   selectedOfferId: string | null;
+  className?: string;
 };
 
 const defaultCustomIcon = new Icon({
@@ -23,7 +24,12 @@ const currentCustomIcon = new Icon({
   iconAnchor: [13.5, 39],
 });
 
-function Map({ city, offers, selectedOfferId }: MapProps): JSX.Element {
+function Map({
+  city,
+  offers,
+  selectedOfferId,
+  className,
+}: MapProps): JSX.Element {
   const mapRef = useRef(null);
   const map = useMap(mapRef, city);
 
@@ -51,7 +57,9 @@ function Map({ city, offers, selectedOfferId }: MapProps): JSX.Element {
     }
   }, [map, offers, selectedOfferId]);
 
-  return <section className="cities__map map" ref={mapRef}></section>;
+  return (
+    <section className={className ?? 'cities__map map'} ref={mapRef}></section>
+  );
 }
 
 export default Map;
