@@ -4,20 +4,18 @@ import { useSelector, useDispatch } from 'react-redux';
 import CardList from '../../components/card-list/card-list';
 import Map from '../../components/map/map';
 import CitiesList from '../../components/cities-list/cities-list';
-import { Offer } from '../../types/offer';
 import { CITIES } from '../../consts';
 import { changeCity } from '../../store/action';
 import { RootState } from '../../store';
 
-type MainPageProps = {
-  offers: Offer[];
-};
-
-function MainPage({ offers }: MainPageProps): JSX.Element {
+function MainPage(): JSX.Element {
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
 
   const dispatch = useDispatch();
-  const selectedCity = useSelector((state: RootState) => state.city);
+  const { selectedCity, offers } = useSelector((state: RootState) => ({
+    selectedCity: state.city,
+    offers: state.offers,
+  }));
 
   const handleCityClick = (cityName: string) => {
     dispatch(changeCity(cityName));

@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Offer } from '../../types/offer';
-
-type FavoritesPageProps = {
-  offers: Offer[];
-};
+import { RootState } from '../../store';
 
 const groupOffersByCity = (offers: Offer[]) =>
   offers.reduce<{ [key: string]: Offer[] }>((acc, offer) => {
@@ -14,7 +12,9 @@ const groupOffersByCity = (offers: Offer[]) =>
     return acc;
   }, {});
 
-function FavoritesPage({ offers }: FavoritesPageProps): JSX.Element {
+function FavoritesPage(): JSX.Element {
+  const offersFromState = useSelector((state: RootState) => state.offers);
+  const offers = offersFromState.filter((offer) => offer.isFavorite);
   const groupedOffers = groupOffersByCity(offers);
   const cities = Object.keys(groupedOffers);
 
