@@ -1,13 +1,15 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import CommentForm from '../../components/comment-form/comment-form';
-import { offers } from '../../mocks/offers';
 import { reviews } from '../../mocks/reviews';
 import ReviewsList from '../../components/reviews-list/reviews-list';
 import Map from '../../components/map/map';
 import CardList from '../../components/card-list/card-list';
+import { RootState } from '../../store';
 
 function OfferPage(): JSX.Element {
   const { id } = useParams();
+  const offers = useSelector((state: RootState) => state.offers);
   const offer = offers.find((o) => o.id === id);
   const favoriteCount = offers.filter((o) => o.isFavorite).length;
 
@@ -152,7 +154,7 @@ function OfferPage(): JSX.Element {
                   >
                     <img
                       className="offer__avatar user__avatar"
-                      src={host.avatarUrl}
+                      src={`/${host.avatarUrl}`}
                       width="74"
                       height="74"
                       alt="Host avatar"
