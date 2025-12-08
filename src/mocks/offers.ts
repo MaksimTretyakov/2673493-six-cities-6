@@ -167,4 +167,38 @@ export const offers: Offer[] = [
     images: ['img/apartment-03.jpg', 'img/apartment-01.jpg'],
     maxAdults: 2,
   },
+  {
+    id: '5',
+    title: 'Loft Studio in the Central Area',
+    type: 'Apartment',
+    price: 250,
+    city: {
+      name: 'Paris',
+      location: {
+        latitude: 48.85661,
+        longitude: 2.351499,
+        zoom: 13,
+      },
+    },
+    location: {
+      latitude: 48.868610000000004,
+      longitude: 2.342499,
+      zoom: 16,
+    },
+    isFavorite: true,
+    isPremium: false,
+    rating: 4.5,
+    previewImage: 'img/apartment-01.jpg',
+    description: 'A super popular loft with all the amenities you need.',
+    bedrooms: 2,
+    goods: ['Wi-Fi', 'Kitchen', 'Heating'],
+    host: {
+      id: 5,
+      name: 'Sophie',
+      isPro: true,
+      avatarUrl: 'img/avatar-angelina.jpg',
+    },
+    images: ['img/apartment-01.jpg'],
+    maxAdults: 3,
+  },
 ];
