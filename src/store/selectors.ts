@@ -16,6 +16,16 @@ const groupOffersByCity = (offers: Offer[]) =>
 
 export const selectOffers = (state: RootState) => state[NameSpace.Data].offers;
 export const selectCity = (state: RootState) => state[NameSpace.App].city;
+export const selectComments = (state: RootState) =>
+  state[NameSpace.Data].comments;
+
+export const selectSortedComments = createSelector(
+  [selectComments],
+  (comments) =>
+    [...comments].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+);
 
 export const selectOffersForCity = createSelector(
   [selectOffers, selectCity],

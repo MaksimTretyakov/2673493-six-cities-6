@@ -1,19 +1,43 @@
 import { Link, Navigate } from 'react-router-dom';
-import { FormEvent, useRef } from 'react';
+import { FormEvent, useRef, useState, useMemo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAction } from '../../store/api-actions';
 import { RootState, AppDispatch } from '../../store';
-import { AuthorizationStatus } from '../../consts';
+import { AuthorizationStatus, CITIES } from '../../consts';
 import Header from '../../components/header/header';
 import { NameSpace } from '../../store/const';
+import { changeCity } from '../../store/action';
+
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{2,}$/;
 
 function LoginPage(): JSX.Element {
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+  const [isFormValid, setIsFormValid] = useState(false);
+
   const dispatch = useDispatch<AppDispatch>();
   const authorizationStatus = useSelector(
     (state: RootState) => state[NameSpace.User].authorizationStatus
   );
+
+  const randomCity = useMemo(
+    () => CITIES[Math.floor(Math.random() * CITIES.length)],
+    []
+  );
+
+  const handleInputChange = useCallback(() => {
+    const isPasswordCorrect = passwordRef.current
+      ? PASSWORD_REGEX.test(passwordRef.current.value)
+      : false;
+    const isEmailFilled = emailRef.current
+      ? emailRef.current.value.length > 0
+      : false;
+    setIsFormValid(isPasswordCorrect && isEmailFilled);
+  }, []);
+
+  const handleCityClick = useCallback(() => {
+    dispatch(changeCity(randomCity.name));
+  }, [dispatch, randomCity.name]);
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
@@ -55,6 +79,7 @@ function LoginPage(): JSX.Element {
                   name="email"
                   placeholder="Email"
                   required
+                  onChange={handleInputChange}
                 />
               </div>
               <div className="login__input-wrapper form__input-wrapper">
@@ -66,11 +91,13 @@ function LoginPage(): JSX.Element {
                   name="password"
                   placeholder="Password"
                   required
+                  onChange={handleInputChange}
                 />
               </div>
               <button
                 className="login__submit form__submit button"
                 type="submit"
+                disabled={!isFormValid}
               >
                 Sign in
               </button>
@@ -78,8 +105,12 @@ function LoginPage(): JSX.Element {
           </section>
           <section className="locations locations--login locations--current">
             <div className="locations__item">
-              <Link className="locations__item-link" to="/">
-                <span>Amsterdam</span>
+              <Link
+                className="locations__item-link"
+                to="/"
+                onClick={handleCityClick}
+              >
+                <span>{randomCity.name}</span>
               </Link>
             </div>
           </section>

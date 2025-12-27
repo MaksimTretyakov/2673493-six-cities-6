@@ -1,5 +1,16 @@
 import { appProcess } from './app-process';
 import { changeCity, changeSortType, setError } from '../action';
+import {
+  fetchCommentsAction,
+  fetchFavoriteOffersAction,
+  fetchNearbyOffersAction,
+  fetchOfferAction,
+  fetchOffersAction,
+  loginAction,
+  logoutAction,
+  postCommentAction,
+  toggleFavoriteStatusAction,
+} from '../api-actions';
 import { SortingOption } from '../../consts';
 
 describe('AppProcess Reducer', () => {
@@ -40,6 +51,68 @@ describe('AppProcess Reducer', () => {
     const action = setError(errorMessage);
     const result = appProcess(initialState, action);
     expect(result.error).toBe(errorMessage);
+  });
+
+  it('should set error on postCommentAction.rejected', () => {
+    const action = { type: postCommentAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe(
+      'Failed to post comment. Please try again later.'
+    );
+  });
+
+  it('should set error on loginAction.rejected', () => {
+    const action = { type: loginAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe('Login failed. Please check your credentials.');
+  });
+
+  it('should set error on fetchOffersAction.rejected', () => {
+    const action = { type: fetchOffersAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe('Failed to load offers. Please try again later.');
+  });
+
+  it('should set error on fetchOfferAction.rejected', () => {
+    const action = { type: fetchOfferAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe(
+      'Failed to load offer details. Please try again later.'
+    );
+  });
+
+  it('should set error on fetchNearbyOffersAction.rejected', () => {
+    const action = { type: fetchNearbyOffersAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe('Failed to load nearby offers.');
+  });
+
+  it('should set error on fetchCommentsAction.rejected', () => {
+    const action = { type: fetchCommentsAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe('Failed to load comments.');
+  });
+
+  it('should set error on logoutAction.rejected', () => {
+    const action = { type: logoutAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe('Logout failed. Please try again.');
+  });
+
+  it('should set error on toggleFavoriteStatusAction.rejected', () => {
+    const action = { type: toggleFavoriteStatusAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe(
+      'Failed to update favorite status. Please try again.'
+    );
+  });
+
+  it('should set error on fetchFavoriteOffersAction.rejected', () => {
+    const action = { type: fetchFavoriteOffersAction.rejected.type };
+    const result = appProcess(initialState, action);
+    expect(result.error).toBe(
+      'Failed to load favorite offers. Please try again later.'
+    );
   });
 
   it('should set error to null with "setError" action', () => {

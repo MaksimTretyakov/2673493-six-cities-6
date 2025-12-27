@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, Fragment, useEffect } from 'react';
+import { useState, ChangeEvent, FormEvent, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { postCommentAction } from '../../store/api-actions';
 import { AppDispatch, RootState } from '../../store';
@@ -27,21 +27,11 @@ function CommentForm({ offerId }: CommentFormProps): JSX.Element {
   const isSubmitting = useSelector(
     (state: RootState) => state[NameSpace.Data].isCommentSubmitting
   );
-  const comments = useSelector(
-    (state: RootState) => state[NameSpace.Data].comments
-  );
 
   const isFormValid =
     review.length >= MIN_COMMENT_LENGTH &&
     review.length <= MAX_COMMENT_LENGTH &&
     rating > 0;
-
-  useEffect(() => {
-    if (!isSubmitting) {
-      setRating(0);
-      setReview('');
-    }
-  }, [comments, isSubmitting]);
 
   const handleRatingChange = (evt: ChangeEvent<HTMLInputElement>) => {
     setRating(Number(evt.target.value));
@@ -59,7 +49,13 @@ function CommentForm({ offerId }: CommentFormProps): JSX.Element {
           offerId,
           commentData: { comment: review, rating },
         })
-      );
+      )
+        .unwrap()
+        .then(() => {
+          setRating(0);
+          setReview('');
+        })
+        .catch(() => {});
     }
   };
 

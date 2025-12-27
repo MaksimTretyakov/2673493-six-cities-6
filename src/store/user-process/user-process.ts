@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { UserData } from '../../types/auth';
 import { requireAuthorization } from '../action';
-import { checkAuthAction, loginAction } from '../api-actions';
+import { checkAuthAction, loginAction, logoutAction } from '../api-actions';
 import { AuthorizationStatus } from '../../consts';
 
 type UserProcess = {
@@ -32,9 +32,11 @@ export const userProcess = createReducer(initialState, (builder) => {
       state.user = action.payload;
     })
     .addCase(loginAction.rejected, (state) => {
-      if (state.authorizationStatus !== AuthorizationStatus.Auth) {
-        state.authorizationStatus = AuthorizationStatus.NoAuth;
-        state.user = null;
-      }
+      state.authorizationStatus = AuthorizationStatus.NoAuth;
+      state.user = null;
+    })
+    .addCase(logoutAction.fulfilled, (state) => {
+      state.authorizationStatus = AuthorizationStatus.NoAuth;
+      state.user = null;
     });
 });

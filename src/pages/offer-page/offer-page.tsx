@@ -16,25 +16,37 @@ import {
 import Spinner from '../../components/spinner/spinner';
 import { AuthorizationStatus } from '../../consts';
 import { NameSpace } from '../../store/const';
+import { selectSortedComments } from '../../store/selectors';
+
+const MAX_REVIEWS_COUNT = 10;
+const MAX_NEARBY_OFFERS = 3;
 
 function OfferPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  const sortedComments = useSelector(selectSortedComments);
   const {
     currentOffer,
-    comments,
     nearbyOffers,
     isOfferDataLoading,
     authorizationStatus,
   } = useSelector((state: RootState) => ({
     currentOffer: state[NameSpace.Data].currentOffer,
-    comments: state[NameSpace.Data].comments,
     nearbyOffers: state[NameSpace.Data].nearbyOffers,
     isOfferDataLoading: state[NameSpace.Data].isOfferDataLoading,
     authorizationStatus: state[NameSpace.User].authorizationStatus,
   }));
+
+  const commentsToDisplay = useMemo(
+    () => sortedComments.slice(0, MAX_REVIEWS_COUNT),
+    [sortedComments]
+  );
+  const nearbyOffersToDisplay = useMemo(
+    () => nearbyOffers.slice(0, MAX_NEARBY_OFFERS),
+    [nearbyOffers]
+  );
 
   useEffect(() => {
     if (id) {
@@ -46,10 +58,10 @@ function OfferPage(): JSX.Element {
 
   const allOffersForMap = useMemo(() => {
     if (currentOffer) {
-      return [...nearbyOffers, currentOffer];
+      return [...nearbyOffersToDisplay, currentOffer];
     }
-    return nearbyOffers;
-  }, [nearbyOffers, currentOffer]);
+    return nearbyOffersToDisplay;
+  }, [nearbyOffersToDisplay, currentOffer]);
 
   const handleBookmarkClick = useCallback(() => {
     if (authorizationStatus !== AuthorizationStatus.Auth) {
@@ -188,7 +200,7 @@ function OfferPage(): JSX.Element {
                 </div>
               </div>
               <section className="offer__reviews reviews">
-                <ReviewsList reviews={comments} />
+                <ReviewsList reviews={commentsToDisplay} />
                 {isLoggedIn && id && <CommentForm offerId={id} />}
               </section>
             </div>
@@ -206,7 +218,7 @@ function OfferPage(): JSX.Element {
               Other places in the neighbourhood
             </h2>
             <CardList
-              offers={nearbyOffers}
+              offers={nearbyOffersToDisplay}
               listClassName="near-places__list places__list"
               cardClassNamePrefix="near-places"
             />

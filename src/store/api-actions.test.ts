@@ -6,14 +6,12 @@ import { Action } from 'redux';
 import { AppDispatch, RootState } from './index';
 import {
   fetchOffersAction,
+  fetchFavoriteOffersAction,
   checkAuthAction,
   loginAction,
   logoutAction,
 } from './api-actions';
 import { makeFakeOffer, makeFakeUserData } from '../utils/mocks';
-import { requireAuthorization } from './action';
-import { AuthorizationStatus } from '../consts';
-import { PayloadAction } from '@reduxjs/toolkit';
 
 describe('Async actions', () => {
   const api = createAPI();
@@ -41,6 +39,7 @@ describe('Async actions', () => {
   it('should dispatch checkAuthAction.pending and checkAuthAction.fulfilled when server returns 200', async () => {
     const mockUser = makeFakeUserData();
     mockAPI.onGet('/login').reply(200, mockUser);
+    mockAPI.onGet('/favorite').reply(200, []);
     const store = mockStore();
 
     await store.dispatch(checkAuthAction());
@@ -48,6 +47,7 @@ describe('Async actions', () => {
     const actions = store.getActions().map(({ type }) => type);
     expect(actions).toEqual([
       checkAuthAction.pending.type,
+      fetchFavoriteOffersAction.pending.type,
       checkAuthAction.fulfilled.type,
     ]);
   });
@@ -56,6 +56,7 @@ describe('Async actions', () => {
     const mockUser = makeFakeUserData();
     const authData = { email: 'test@test.com', password: '123' };
     mockAPI.onPost('/login').reply(200, mockUser);
+    mockAPI.onGet('/favorite').reply(200, []);
     const store = mockStore();
 
     await store.dispatch(loginAction(authData));
@@ -63,32 +64,22 @@ describe('Async actions', () => {
     const actions = store.getActions().map(({ type }) => type);
     expect(actions).toEqual([
       loginAction.pending.type,
+      fetchFavoriteOffersAction.pending.type,
       loginAction.fulfilled.type,
     ]);
   });
 
-  it('should dispatch logoutAction.pending, requireAuthorization and logoutAction.fulfilled when server returns 204', async () => {
+  it('should dispatch logoutAction.pending and logoutAction.fulfilled when server returns 204', async () => {
     mockAPI.onDelete('/logout').reply(204);
     const store = mockStore();
 
     await store.dispatch(logoutAction());
 
-    const actions = store.getActions();
-    const actionTypes = actions.map(({ type }) => type);
+    const actions = store.getActions().map(({ type }) => type);
 
-    expect(actionTypes).toEqual([
+    expect(actions).toEqual([
       logoutAction.pending.type,
-      requireAuthorization.type,
       logoutAction.fulfilled.type,
     ]);
-
-    const requireAuthorizationAction = actions.find(
-      (action) => action.type === requireAuthorization.type
-    );
-
-    expect(
-      (requireAuthorizationAction as PayloadAction<AuthorizationStatus>)
-        ?.payload
-    ).toBe(AuthorizationStatus.NoAuth);
   });
 });
