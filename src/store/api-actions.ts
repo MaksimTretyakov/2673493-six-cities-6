@@ -4,8 +4,7 @@ import { Offer } from '../types/offer';
 import { Review, CommentData } from '../types/review';
 import { AuthData, UserData } from '../types/auth';
 import { saveToken, dropToken } from '../services/token';
-import { requireAuthorization } from './action';
-import { AuthorizationStatus } from '../consts';
+import { AppDispatch } from './index';
 
 export const fetchOffersAction = createAsyncThunk<
   Offer[],
@@ -52,33 +51,13 @@ export const postCommentAction = createAsyncThunk<
   return data;
 });
 
-export const checkAuthAction = createAsyncThunk<
-  UserData,
-  undefined,
-  { extra: AxiosInstance }
->('user/checkAuth', async (_arg, { extra: api }) => {
-  const { data } = await api.get<UserData>('/login');
-  return data;
-});
-
-export const loginAction = createAsyncThunk<
-  UserData,
-  AuthData,
-  { extra: AxiosInstance }
->('user/login', async ({ email, password }, { extra: api }) => {
-  const { data } = await api.post<UserData>('/login', { email, password });
-  saveToken(data.token);
-  return data;
-});
-
 export const logoutAction = createAsyncThunk<
   void,
   undefined,
   { extra: AxiosInstance }
->('user/logout', async (_arg, { dispatch, extra: api }) => {
+>('user/logout', async (_arg, { extra: api }) => {
   await api.delete('/logout');
   dropToken();
-  dispatch(requireAuthorization(AuthorizationStatus.NoAuth));
 });
 
 export const toggleFavoriteStatusAction = createAsyncThunk<
@@ -96,5 +75,26 @@ export const fetchFavoriteOffersAction = createAsyncThunk<
   { extra: AxiosInstance }
 >('data/fetchFavoriteOffers', async (_arg, { extra: api }) => {
   const { data } = await api.get<Offer[]>('/favorite');
+  return data;
+});
+
+export const loginAction = createAsyncThunk<
+  UserData,
+  AuthData,
+  { extra: AxiosInstance; dispatch: AppDispatch }
+>('user/login', async ({ email, password }, { extra: api, dispatch }) => {
+  const { data } = await api.post<UserData>('/login', { email, password });
+  saveToken(data.token);
+  dispatch(fetchFavoriteOffersAction());
+  return data;
+});
+
+export const checkAuthAction = createAsyncThunk<
+  UserData,
+  undefined,
+  { extra: AxiosInstance; dispatch: AppDispatch }
+>('user/checkAuth', async (_arg, { extra: api, dispatch }) => {
+  const { data } = await api.get<UserData>('/login');
+  dispatch(fetchFavoriteOffersAction());
   return data;
 });

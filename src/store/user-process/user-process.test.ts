@@ -1,6 +1,6 @@
 import { userProcess } from './user-process';
 import { requireAuthorization } from '../action';
-import { checkAuthAction, loginAction } from '../api-actions';
+import { checkAuthAction, loginAction, logoutAction } from '../api-actions';
 import { AuthorizationStatus } from '../../consts';
 import { makeFakeUserData } from '../../utils/mocks';
 
@@ -55,6 +55,19 @@ describe('UserProcess Reducer', () => {
     it('should set NoAuth status on rejected', () => {
       const action = { type: loginAction.rejected.type };
       const result = userProcess(initialState, action);
+      expect(result.authorizationStatus).toBe(AuthorizationStatus.NoAuth);
+      expect(result.user).toBeNull();
+    });
+  });
+
+  describe('logoutAction', () => {
+    it('should set NoAuth status and clear user data on fulfilled', () => {
+      const stateWithUser = {
+        authorizationStatus: AuthorizationStatus.Auth,
+        user: makeFakeUserData(),
+      };
+      const action = { type: logoutAction.fulfilled.type };
+      const result = userProcess(stateWithUser, action);
       expect(result.authorizationStatus).toBe(AuthorizationStatus.NoAuth);
       expect(result.user).toBeNull();
     });

@@ -9,6 +9,7 @@ import {
   postCommentAction,
   toggleFavoriteStatusAction,
   fetchFavoriteOffersAction,
+  logoutAction,
 } from '../api-actions';
 
 type DataProcess = {
@@ -59,8 +60,14 @@ export const dataProcess = createReducer(initialState, (builder) => {
     .addCase(fetchCommentsAction.fulfilled, (state, action) => {
       state.comments = action.payload;
     })
+    .addCase(fetchCommentsAction.rejected, (state) => {
+      state.comments = [];
+    })
     .addCase(fetchNearbyOffersAction.fulfilled, (state, action) => {
       state.nearbyOffers = action.payload;
+    })
+    .addCase(fetchNearbyOffersAction.rejected, (state) => {
+      state.nearbyOffers = [];
     })
     .addCase(postCommentAction.pending, (state) => {
       state.isCommentSubmitting = true;
@@ -93,5 +100,20 @@ export const dataProcess = createReducer(initialState, (builder) => {
     })
     .addCase(fetchFavoriteOffersAction.fulfilled, (state, action) => {
       state.favoriteOffers = action.payload;
+    })
+    .addCase(fetchFavoriteOffersAction.rejected, (state) => {
+      state.favoriteOffers = [];
+    })
+    .addCase(logoutAction.fulfilled, (state) => {
+      state.offers = state.offers.map((offer) =>
+        offer.isFavorite ? { ...offer, isFavorite: false } : offer
+      );
+      state.nearbyOffers = state.nearbyOffers.map((offer) =>
+        offer.isFavorite ? { ...offer, isFavorite: false } : offer
+      );
+      if (state.currentOffer?.isFavorite) {
+        state.currentOffer.isFavorite = false;
+      }
+      state.favoriteOffers = [];
     });
 });

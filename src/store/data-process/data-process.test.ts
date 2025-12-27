@@ -81,6 +81,13 @@ describe('DataProcess Reducer', () => {
     });
   });
 
+  it('should set comments to empty array on rejected', () => {
+    const stateWithData = { ...initialState, comments: reviews };
+    const action = { type: fetchCommentsAction.rejected.type };
+    const result = dataProcess(stateWithData, action);
+    expect(result.comments).toEqual([]);
+  });
+
   describe('fetchNearbyOffersAction', () => {
     it('should load nearby offers on fulfilled', () => {
       const action = {
@@ -90,6 +97,13 @@ describe('DataProcess Reducer', () => {
       const result = dataProcess(initialState, action);
       expect(result.nearbyOffers).toEqual(offers);
     });
+  });
+
+  it('should set nearby offers to empty array on rejected', () => {
+    const stateWithData = { ...initialState, nearbyOffers: offers };
+    const action = { type: fetchNearbyOffersAction.rejected.type };
+    const result = dataProcess(stateWithData, action);
+    expect(result.nearbyOffers).toEqual([]);
   });
 
   describe('toggleFavoriteStatusAction', () => {
@@ -113,6 +127,13 @@ describe('DataProcess Reducer', () => {
       };
       const result = dataProcess(initialState, action);
       expect(result.favoriteOffers).toEqual(offers);
+    });
+
+    it('should set favorite offers to empty array on rejected', () => {
+      const stateWithData = { ...initialState, favoriteOffers: offers };
+      const action = { type: fetchFavoriteOffersAction.rejected.type };
+      const result = dataProcess(stateWithData, action);
+      expect(result.favoriteOffers).toEqual([]);
     });
   });
 });
