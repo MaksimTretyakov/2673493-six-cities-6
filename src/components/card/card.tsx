@@ -1,6 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Offer } from '../../types/offer';
 import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import { AuthorizationStatus } from '../../consts';
+import { toggleFavoriteStatusAction } from '../../store/api-actions';
+import { NameSpace } from '../../store/const';
 
 type CardProps = {
   offer: Offer;
@@ -23,6 +28,22 @@ function Card({
     rating,
     previewImage,
   } = offer;
+
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const authorizationStatus = useSelector(
+    (state: RootState) => state[NameSpace.User].authorizationStatus
+  );
+
+  const handleBookmarkClick = useCallback(() => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+    const newStatus = isFavorite ? 0 : 1;
+    dispatch(toggleFavoriteStatusAction({ offerId: id, status: newStatus }));
+  }, [authorizationStatus, dispatch, id, isFavorite, navigate]);
 
   const handleMouseEnter = useCallback(() => {
     onCardHover?.(id);
@@ -67,6 +88,7 @@ function Card({
               isFavorite ? 'place-card__bookmark-button--active' : ''
             } button`}
             type="button"
+            onClick={handleBookmarkClick}
           >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use xlinkHref="#icon-bookmark"></use>
