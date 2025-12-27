@@ -1,52 +1,36 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { Offer } from '../types/offer';
-import { Review } from '../types/review';
-import { UserData } from '../types/auth';
-import { changeCity, setError, requireAuthorization } from './action';
+import { Offer } from '../../types/offer';
+import { Review } from '../../types/review';
 import {
   fetchOffersAction,
-  checkAuthAction,
-  loginAction,
   fetchOfferAction,
   fetchCommentsAction,
   fetchNearbyOffersAction,
   postCommentAction,
-} from './api-actions';
-import { AuthorizationStatus } from '../consts';
+} from '../api-actions';
 
-type InitialState = {
-  city: string;
+type DataProcess = {
   offers: Offer[];
   isOffersDataLoading: boolean;
   isOfferDataLoading: boolean;
   isCommentSubmitting: boolean;
-  authorizationStatus: AuthorizationStatus;
-  user: UserData | null;
-  error: string | null;
   currentOffer: Offer | null;
   comments: Review[];
   nearbyOffers: Offer[];
 };
 
-const initialState: InitialState = {
-  city: 'Paris',
+const initialState: DataProcess = {
   offers: [],
   isOffersDataLoading: false,
   isOfferDataLoading: true,
   isCommentSubmitting: false,
-  authorizationStatus: AuthorizationStatus.Unknown,
-  user: null,
-  error: null,
   currentOffer: null,
   comments: [],
   nearbyOffers: [],
 };
 
-const reducer = createReducer(initialState, (builder) => {
+export const dataProcess = createReducer(initialState, (builder) => {
   builder
-    .addCase(changeCity, (state, action) => {
-      state.city = action.payload;
-    })
     .addCase(fetchOffersAction.pending, (state) => {
       state.isOffersDataLoading = true;
     })
@@ -83,32 +67,5 @@ const reducer = createReducer(initialState, (builder) => {
     })
     .addCase(postCommentAction.rejected, (state) => {
       state.isCommentSubmitting = false;
-    })
-    .addCase(requireAuthorization, (state, action) => {
-      state.authorizationStatus = action.payload;
-    })
-    .addCase(checkAuthAction.fulfilled, (state, action) => {
-      state.authorizationStatus = AuthorizationStatus.Auth;
-      state.user = action.payload;
-    })
-    .addCase(checkAuthAction.rejected, (state) => {
-      state.authorizationStatus = AuthorizationStatus.NoAuth;
-      state.user = null;
-    })
-    .addCase(loginAction.fulfilled, (state, action) => {
-      state.authorizationStatus = AuthorizationStatus.Auth;
-      state.user = action.payload;
-    })
-    .addCase(loginAction.rejected, (state) => {
-      if (state.authorizationStatus !== AuthorizationStatus.Auth) {
-        state.authorizationStatus = AuthorizationStatus.NoAuth;
-        state.user = null;
-      }
-      state.error = 'Login failed. Please check your credentials.';
-    })
-    .addCase(setError, (state, action) => {
-      state.error = action.payload;
     });
 });
-
-export { reducer };

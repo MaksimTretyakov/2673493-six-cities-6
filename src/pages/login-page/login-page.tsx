@@ -5,13 +5,14 @@ import { loginAction } from '../../store/api-actions';
 import { RootState, AppDispatch } from '../../store';
 import { AuthorizationStatus } from '../../consts';
 import Header from '../../components/header/header';
+import { NameSpace } from '../../store/const';
 
 function LoginPage(): JSX.Element {
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const authorizationStatus = useSelector(
-    (state: RootState) => state.authorizationStatus
+    (state: RootState) => state[NameSpace.User].authorizationStatus
   );
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {

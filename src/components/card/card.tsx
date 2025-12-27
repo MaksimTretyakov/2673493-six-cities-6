@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Offer } from '../../types/offer';
+import React, { useCallback } from 'react';
 
 type CardProps = {
   offer: Offer;
@@ -23,13 +24,13 @@ function Card({
     previewImage,
   } = offer;
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     onCardHover?.(id);
-  };
+  }, [id, onCardHover]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     onCardHover?.(null);
-  };
+  }, [onCardHover]);
 
   return (
     <article
@@ -88,4 +89,5 @@ function Card({
   );
 }
 
-export default Card;
+const MemoizedCard = React.memo(Card);
+export default MemoizedCard;

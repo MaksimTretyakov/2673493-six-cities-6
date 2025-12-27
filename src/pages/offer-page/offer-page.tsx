@@ -1,6 +1,6 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import CommentForm from '../../components/comment-form/comment-form';
 import ReviewsList from '../../components/reviews-list/reviews-list';
 import Map from '../../components/map/map';
@@ -14,6 +14,7 @@ import {
 } from '../../store/api-actions';
 import Spinner from '../../components/spinner/spinner';
 import { AuthorizationStatus } from '../../consts';
+import { NameSpace } from '../../store/const';
 
 function OfferPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
@@ -26,11 +27,11 @@ function OfferPage(): JSX.Element {
     isOfferDataLoading,
     authorizationStatus,
   } = useSelector((state: RootState) => ({
-    currentOffer: state.currentOffer,
-    comments: state.comments,
-    nearbyOffers: state.nearbyOffers,
-    isOfferDataLoading: state.isOfferDataLoading,
-    authorizationStatus: state.authorizationStatus,
+    currentOffer: state[NameSpace.Data].currentOffer,
+    comments: state[NameSpace.Data].comments,
+    nearbyOffers: state[NameSpace.Data].nearbyOffers,
+    isOfferDataLoading: state[NameSpace.Data].isOfferDataLoading,
+    authorizationStatus: state[NameSpace.User].authorizationStatus,
   }));
 
   useEffect(() => {
@@ -41,6 +42,13 @@ function OfferPage(): JSX.Element {
     }
   }, [id, dispatch]);
 
+  const allOffersForMap = useMemo(() => {
+    if (currentOffer) {
+      return [...nearbyOffers, currentOffer];
+    }
+    return nearbyOffers;
+  }, [nearbyOffers, currentOffer]);
+
   if (isOfferDataLoading) {
     return <Spinner />;
   }
@@ -48,8 +56,6 @@ function OfferPage(): JSX.Element {
   if (!currentOffer) {
     return <Navigate to="/404" />;
   }
-
-  const allOffersForMap = [...nearbyOffers, currentOffer];
 
   const {
     images,

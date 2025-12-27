@@ -2,6 +2,7 @@ import { useState, ChangeEvent, FormEvent, Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { postCommentAction } from '../../store/api-actions';
 import { AppDispatch, RootState } from '../../store';
+import { NameSpace } from '../../store/const';
 
 const RATING_STARS = [
   { value: 5, title: 'perfect' },
@@ -24,9 +25,11 @@ function CommentForm({ offerId }: CommentFormProps): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
 
   const isSubmitting = useSelector(
-    (state: RootState) => state.isCommentSubmitting
+    (state: RootState) => state[NameSpace.Data].isCommentSubmitting
   );
-  const comments = useSelector((state: RootState) => state.comments);
+  const comments = useSelector(
+    (state: RootState) => state[NameSpace.Data].comments
+  );
 
   const isFormValid =
     review.length >= MIN_COMMENT_LENGTH &&
