@@ -3,6 +3,8 @@ import { RootState } from './index';
 import { Offer } from '../types/offer';
 import { NameSpace } from './const';
 
+import { SortingOption } from '../consts';
+
 const groupOffersByCity = (offers: Offer[]) =>
   offers.reduce<{ [key: string]: Offer[] }>((acc, offer) => {
     if (!acc[offer.city.name]) {
@@ -32,4 +34,25 @@ export const selectFavoriteCount = createSelector(
 export const selectGroupedFavoriteOffers = createSelector(
   [selectFavoriteOffers],
   (favoriteOffers) => groupOffersByCity(favoriteOffers)
+);
+
+export const selectSortType = (state: RootState) =>
+  state[NameSpace.App].sortType;
+
+export const selectSortedOffersForCity = createSelector(
+  [selectOffersForCity, selectSortType],
+  (offers, sortType) => {
+    const offersCopy = [...offers];
+    switch (sortType) {
+      case SortingOption.PriceLowToHigh:
+        return offersCopy.sort((a, b) => a.price - b.price);
+      case SortingOption.PriceHighToLow:
+        return offersCopy.sort((a, b) => b.price - a.price);
+      case SortingOption.TopRatedFirst:
+        return offersCopy.sort((a, b) => b.rating - a.rating);
+      case SortingOption.Popular:
+      default:
+        return offers;
+    }
+  }
 );
