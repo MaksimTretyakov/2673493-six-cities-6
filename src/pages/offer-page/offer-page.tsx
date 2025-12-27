@@ -1,24 +1,55 @@
 import { useParams, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import CommentForm from '../../components/comment-form/comment-form';
-import { reviews } from '../../mocks/reviews';
 import ReviewsList from '../../components/reviews-list/reviews-list';
 import Map from '../../components/map/map';
 import CardList from '../../components/card-list/card-list';
-import { RootState } from '../../store';
+import { RootState, AppDispatch } from '../../store';
 import Header from '../../components/header/header';
+import {
+  fetchOfferAction,
+  fetchCommentsAction,
+  fetchNearbyOffersAction,
+} from '../../store/api-actions';
+import Spinner from '../../components/spinner/spinner';
+import { AuthorizationStatus } from '../../consts';
 
 function OfferPage(): JSX.Element {
-  const { id } = useParams();
-  const offers = useSelector((state: RootState) => state.offers);
-  const offer = offers.find((o) => o.id === id);
+  const { id } = useParams<{ id: string }>();
+  const dispatch = useDispatch<AppDispatch>();
 
-  if (!offer) {
+  const {
+    currentOffer,
+    comments,
+    nearbyOffers,
+    isOfferDataLoading,
+    authorizationStatus,
+  } = useSelector((state: RootState) => ({
+    currentOffer: state.currentOffer,
+    comments: state.comments,
+    nearbyOffers: state.nearbyOffers,
+    isOfferDataLoading: state.isOfferDataLoading,
+    authorizationStatus: state.authorizationStatus,
+  }));
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchOfferAction(id));
+      dispatch(fetchCommentsAction(id));
+      dispatch(fetchNearbyOffersAction(id));
+    }
+  }, [id, dispatch]);
+
+  if (isOfferDataLoading) {
+    return <Spinner />;
+  }
+
+  if (!currentOffer) {
     return <Navigate to="/404" />;
   }
 
-  const nearbyOffers = offers.filter((o) => o.id !== id).slice(0, 3);
-  const allOffersForMap = [...nearbyOffers, offer];
+  const allOffersForMap = [...nearbyOffers, currentOffer];
 
   const {
     images,
@@ -33,12 +64,13 @@ function OfferPage(): JSX.Element {
     goods,
     host,
     description,
-  } = offer;
+  } = currentOffer;
+
+  const isLoggedIn = authorizationStatus === AuthorizationStatus.Auth;
 
   return (
     <div className="page">
       <Header />
-
       <main className="page__main page__main--offer">
         <section className="offer">
           <div className="offer__gallery-container container">
@@ -115,7 +147,7 @@ function OfferPage(): JSX.Element {
                   >
                     <img
                       className="offer__avatar user__avatar"
-                      src={`/${host.avatarUrl}`}
+                      src={host.avatarUrl}
                       width="74"
                       height="74"
                       alt="Host avatar"
@@ -131,16 +163,16 @@ function OfferPage(): JSX.Element {
                 </div>
               </div>
               <section className="offer__reviews reviews">
-                <ReviewsList reviews={reviews} />
-                <CommentForm />
+                <ReviewsList reviews={comments} />
+                {isLoggedIn && id && <CommentForm offerId={id} />}
               </section>
             </div>
           </div>
           <Map
             className="offer__map map"
-            city={offer.city}
+            city={currentOffer.city}
             offers={allOffersForMap}
-            selectedOfferId={offer.id}
+            selectedOfferId={currentOffer.id}
           />
         </section>
         <div className="container">

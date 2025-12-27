@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Offer } from '../../types/offer';
-import { RootState } from '../../store';
+import { RootState, AppDispatch } from '../../store';
 import Header from '../../components/header/header';
+import { fetchOffersAction } from '../../store/api-actions';
 
 const groupOffersByCity = (offers: Offer[]) =>
   offers.reduce<{ [key: string]: Offer[] }>((acc, offer) => {
@@ -14,11 +16,16 @@ const groupOffersByCity = (offers: Offer[]) =>
   }, {});
 
 function FavoritesPage(): JSX.Element {
+  const dispatch = useDispatch<AppDispatch>();
   const offersFromState = useSelector((state: RootState) => state.offers);
   const offers = offersFromState.filter((offer) => offer.isFavorite);
   const groupedOffers = groupOffersByCity(offers);
   const cities = Object.keys(groupedOffers);
   const isEmpty = offers.length === 0;
+
+  useEffect(() => {
+    dispatch(fetchOffersAction());
+  }, [dispatch]);
 
   return (
     <div className={`page ${isEmpty ? 'page--favorites-empty' : ''}`}>
