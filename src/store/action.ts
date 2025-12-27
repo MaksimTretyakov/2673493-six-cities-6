@@ -6,3 +6,4 @@ export const setError = createAction<string | null>('app/setError');
 export const requireAuthorization = createAction<AuthorizationStatus>(
   'user/requireAuthorization'
 );
+export const changeSortType = createAction<string>('app/changeSortType');
