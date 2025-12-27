@@ -11,7 +11,7 @@ function Spinner(): JSX.Element {
 
   return (
     <div style={containerStyle}>
-      <div className={styles.spinner} />
+      <div className={styles.spinner} data-testid="spinner" />
     </div>
   );
 }
