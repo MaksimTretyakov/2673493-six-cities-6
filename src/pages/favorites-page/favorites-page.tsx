@@ -1,25 +1,47 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch } from '../../store';
+import { AppDispatch, RootState } from '../../store';
 import Header from '../../components/header/header';
-import { fetchOffersAction } from '../../store/api-actions';
 import {
-  selectFavoriteOffers,
-  selectGroupedFavoriteOffers,
+  fetchFavoriteOffersAction,
+  toggleFavoriteStatusAction,
+} from '../../store/api-actions';
+import {
+  selectFetchedFavorites,
+  selectGroupedFetchedFavorites,
 } from '../../store/selectors';
+import { AuthorizationStatus } from '../../consts';
+import { NameSpace } from '../../store/const';
 
 function FavoritesPage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
-  const offers = useSelector(selectFavoriteOffers);
-  const groupedOffers = useSelector(selectGroupedFavoriteOffers);
+  const navigate = useNavigate();
+
+  const offers = useSelector(selectFetchedFavorites);
+  const groupedOffers = useSelector(selectGroupedFetchedFavorites);
+  const authorizationStatus = useSelector(
+    (state: RootState) => state[NameSpace.User].authorizationStatus
+  );
 
   const cities = Object.keys(groupedOffers);
   const isEmpty = offers.length === 0;
 
   useEffect(() => {
-    dispatch(fetchOffersAction());
+    dispatch(fetchFavoriteOffersAction());
   }, [dispatch]);
+
+  const handleBookmarkClick = useCallback(
+    (offerId: string, isFavorite: boolean) => {
+      if (authorizationStatus !== AuthorizationStatus.Auth) {
+        navigate('/login');
+        return;
+      }
+      const newStatus = isFavorite ? 0 : 1;
+      dispatch(toggleFavoriteStatusAction({ offerId, status: newStatus }));
+    },
+    [authorizationStatus, dispatch, navigate]
+  );
 
   return (
     <div className={`page ${isEmpty ? 'page--favorites-empty' : ''}`}>
@@ -89,8 +111,18 @@ function FavoritesPage(): JSX.Element {
                                   </span>
                                 </div>
                                 <button
-                                  className="place-card__bookmark-button place-card__bookmark-button--active button"
+                                  className={`place-card__bookmark-button ${
+                                    offer.isFavorite
+                                      ? 'place-card__bookmark-button--active'
+                                      : ''
+                                  } button`}
                                   type="button"
+                                  onClick={() =>
+                                    handleBookmarkClick(
+                                      offer.id,
+                                      offer.isFavorite
+                                    )
+                                  }
                                 >
                                   <svg
                                     className="place-card__bookmark-icon"

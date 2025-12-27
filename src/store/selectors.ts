@@ -22,18 +22,9 @@ export const selectOffersForCity = createSelector(
   (offers, city) => offers.filter((offer) => offer.city.name === city)
 );
 
-export const selectFavoriteOffers = createSelector([selectOffers], (offers) =>
-  offers.filter((offer) => offer.isFavorite)
-);
-
 export const selectFavoriteCount = createSelector(
-  [selectFavoriteOffers],
+  (state: RootState) => state[NameSpace.Data].favoriteOffers,
   (favoriteOffers) => favoriteOffers.length
-);
-
-export const selectGroupedFavoriteOffers = createSelector(
-  [selectFavoriteOffers],
-  (favoriteOffers) => groupOffersByCity(favoriteOffers)
 );
 
 export const selectSortType = (state: RootState) =>
@@ -55,4 +46,12 @@ export const selectSortedOffersForCity = createSelector(
         return offers;
     }
   }
+);
+
+export const selectFetchedFavorites = (state: RootState) =>
+  state[NameSpace.Data].favoriteOffers;
+
+export const selectGroupedFetchedFavorites = createSelector(
+  [selectFetchedFavorites],
+  (favoriteOffers) => groupOffersByCity(favoriteOffers)
 );

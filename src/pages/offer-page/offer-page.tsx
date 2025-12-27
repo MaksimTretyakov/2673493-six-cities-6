@@ -1,6 +1,6 @@
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import CommentForm from '../../components/comment-form/comment-form';
 import ReviewsList from '../../components/reviews-list/reviews-list';
 import Map from '../../components/map/map';
@@ -11,6 +11,7 @@ import {
   fetchOfferAction,
   fetchCommentsAction,
   fetchNearbyOffersAction,
+  toggleFavoriteStatusAction,
 } from '../../store/api-actions';
 import Spinner from '../../components/spinner/spinner';
 import { AuthorizationStatus } from '../../consts';
@@ -19,6 +20,7 @@ import { NameSpace } from '../../store/const';
 function OfferPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const {
     currentOffer,
@@ -48,6 +50,22 @@ function OfferPage(): JSX.Element {
     }
     return nearbyOffers;
   }, [nearbyOffers, currentOffer]);
+
+  const handleBookmarkClick = useCallback(() => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+    if (currentOffer) {
+      const newStatus = currentOffer.isFavorite ? 0 : 1;
+      dispatch(
+        toggleFavoriteStatusAction({
+          offerId: currentOffer.id,
+          status: newStatus,
+        })
+      );
+    }
+  }, [authorizationStatus, navigate, currentOffer, dispatch]);
 
   if (isOfferDataLoading) {
     return <Spinner />;
@@ -102,6 +120,7 @@ function OfferPage(): JSX.Element {
                     isFavorite ? 'offer__bookmark-button--active' : ''
                   } button`}
                   type="button"
+                  onClick={handleBookmarkClick}
                 >
                   <svg className="offer__bookmark-icon" width="31" height="33">
                     <use xlinkHref="#icon-bookmark"></use>
