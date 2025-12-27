@@ -1,26 +1,45 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { Offer } from '../types/offer';
+import { Review } from '../types/review';
 import { UserData } from '../types/auth';
 import { changeCity, setError, requireAuthorization } from './action';
-import { fetchOffersAction, checkAuthAction, loginAction } from './api-actions';
+import {
+  fetchOffersAction,
+  checkAuthAction,
+  loginAction,
+  fetchOfferAction,
+  fetchCommentsAction,
+  fetchNearbyOffersAction,
+  postCommentAction,
+} from './api-actions';
 import { AuthorizationStatus } from '../consts';
 
 type InitialState = {
   city: string;
   offers: Offer[];
   isOffersDataLoading: boolean;
+  isOfferDataLoading: boolean;
+  isCommentSubmitting: boolean;
   authorizationStatus: AuthorizationStatus;
   user: UserData | null;
   error: string | null;
+  currentOffer: Offer | null;
+  comments: Review[];
+  nearbyOffers: Offer[];
 };
 
 const initialState: InitialState = {
   city: 'Paris',
   offers: [],
   isOffersDataLoading: false,
+  isOfferDataLoading: true,
+  isCommentSubmitting: false,
   authorizationStatus: AuthorizationStatus.Unknown,
   user: null,
   error: null,
+  currentOffer: null,
+  comments: [],
+  nearbyOffers: [],
 };
 
 const reducer = createReducer(initialState, (builder) => {
@@ -37,7 +56,33 @@ const reducer = createReducer(initialState, (builder) => {
     })
     .addCase(fetchOffersAction.rejected, (state) => {
       state.isOffersDataLoading = false;
-      state.error = 'Failed to load offers. Please check your connection.';
+    })
+    .addCase(fetchOfferAction.pending, (state) => {
+      state.isOfferDataLoading = true;
+    })
+    .addCase(fetchOfferAction.fulfilled, (state, action) => {
+      state.currentOffer = action.payload;
+      state.isOfferDataLoading = false;
+    })
+    .addCase(fetchOfferAction.rejected, (state) => {
+      state.isOfferDataLoading = false;
+      state.currentOffer = null;
+    })
+    .addCase(fetchCommentsAction.fulfilled, (state, action) => {
+      state.comments = action.payload;
+    })
+    .addCase(fetchNearbyOffersAction.fulfilled, (state, action) => {
+      state.nearbyOffers = action.payload;
+    })
+    .addCase(postCommentAction.pending, (state) => {
+      state.isCommentSubmitting = true;
+    })
+    .addCase(postCommentAction.fulfilled, (state, action) => {
+      state.comments = [action.payload, ...state.comments];
+      state.isCommentSubmitting = false;
+    })
+    .addCase(postCommentAction.rejected, (state) => {
+      state.isCommentSubmitting = false;
     })
     .addCase(requireAuthorization, (state, action) => {
       state.authorizationStatus = action.payload;

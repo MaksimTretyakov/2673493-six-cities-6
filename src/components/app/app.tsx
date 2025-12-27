@@ -51,14 +51,12 @@ function App(): JSX.Element {
   const authorizationStatus = useSelector(
     (state: RootState) => state.authorizationStatus
   );
-  const isOffersDataLoading = useSelector(
-    (state: RootState) => state.isOffersDataLoading
-  );
 
-  if (
-    authorizationStatus === AuthorizationStatus.Unknown ||
-    isOffersDataLoading
-  ) {
+  // Мы убрали isOffersDataLoading из проверки ниже.
+  // Это предотвращает бесконечный цикл перемонтирования главной страницы.
+  // Глобальный лоадер (блокирующий роутинг) нужен только при проверке авторизации.
+
+  if (authorizationStatus === AuthorizationStatus.Unknown) {
     return <Spinner />;
   }
 

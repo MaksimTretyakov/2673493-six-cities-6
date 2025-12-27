@@ -1,21 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import CardList from '../../components/card-list/card-list';
 import Map from '../../components/map/map';
 import CitiesList from '../../components/cities-list/cities-list';
 import { CITIES } from '../../consts';
 import { changeCity } from '../../store/action';
-import { RootState } from '../../store';
+import { fetchOffersAction } from '../../store/api-actions';
+import { RootState, AppDispatch } from '../../store';
 import Header from '../../components/header/header';
 
 function MainPage(): JSX.Element {
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { selectedCity, offers } = useSelector((state: RootState) => ({
     selectedCity: state.city,
     offers: state.offers,
   }));
+
+  useEffect(() => {
+    dispatch(fetchOffersAction());
+  }, [dispatch]);
 
   const handleCityClick = (cityName: string) => {
     dispatch(changeCity(cityName));
