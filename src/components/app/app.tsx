@@ -11,11 +11,12 @@ import Spinner from '../spinner/spinner';
 import React, { useEffect } from 'react';
 import { setError } from '../../store/action';
 import { AuthorizationStatus } from '../../consts';
+import { NameSpace } from '../../store/const';
 
 const ERROR_TIMEOUT = 5000;
 
 function ErrorMessage(): JSX.Element | null {
-  const error = useSelector((state: RootState) => state.error);
+  const error = useSelector((state: RootState) => state[NameSpace.App].error);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -49,12 +50,8 @@ function ErrorMessage(): JSX.Element | null {
 
 function App(): JSX.Element {
   const authorizationStatus = useSelector(
-    (state: RootState) => state.authorizationStatus
+    (state: RootState) => state[NameSpace.User].authorizationStatus
   );
-
-  // Мы убрали isOffersDataLoading из проверки ниже.
-  // Это предотвращает бесконечный цикл перемонтирования главной страницы.
-  // Глобальный лоадер (блокирующий роутинг) нужен только при проверке авторизации.
 
   if (authorizationStatus === AuthorizationStatus.Unknown) {
     return <Spinner />;

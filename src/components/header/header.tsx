@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { MouseEvent } from 'react';
+import React, { MouseEvent, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { AuthorizationStatus } from '../../consts';
 import { logoutAction } from '../../store/api-actions';
+import { selectFavoriteCount } from '../../store/selectors';
+import { NameSpace } from '../../store/const';
 
 type HeaderProps = {
   withNavigation?: boolean;
@@ -13,20 +15,19 @@ function Header({ withNavigation = true }: HeaderProps): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
 
-  const { authorizationStatus, user, offers } = useSelector(
-    (state: RootState) => ({
-      authorizationStatus: state.authorizationStatus,
-      user: state.user,
-      offers: state.offers,
-    })
+  const authorizationStatus = useSelector(
+    (state: RootState) => state[NameSpace.User].authorizationStatus
   );
+  const user = useSelector((state: RootState) => state[NameSpace.User].user);
+  const favoriteCount = useSelector(selectFavoriteCount);
 
-  const favoriteCount = offers.filter((offer) => offer.isFavorite).length;
-
-  const handleLogout = (evt: MouseEvent<HTMLAnchorElement>) => {
-    evt.preventDefault();
-    dispatch(logoutAction());
-  };
+  const handleLogout = useCallback(
+    (evt: MouseEvent<HTMLAnchorElement>) => {
+      evt.preventDefault();
+      dispatch(logoutAction());
+    },
+    [dispatch]
+  );
 
   return (
     <header className="header">
@@ -103,4 +104,5 @@ function Header({ withNavigation = true }: HeaderProps): JSX.Element {
   );
 }
 
-export default Header;
+const MemoizedHeader = React.memo(Header);
+export default MemoizedHeader;

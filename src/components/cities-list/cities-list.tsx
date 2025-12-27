@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { City } from '../../types/offer';
 
@@ -12,6 +13,14 @@ function CitiesList({
   selectedCity,
   onCityClick,
 }: CitiesListProps): JSX.Element {
+  const handleCityClick = useCallback(
+    (evt: React.MouseEvent<HTMLAnchorElement>, cityName: string) => {
+      evt.preventDefault();
+      onCityClick(cityName);
+    },
+    [onCityClick]
+  );
+
   return (
     <div className="tabs">
       <section className="locations container">
@@ -23,10 +32,7 @@ function CitiesList({
                   selectedCity === city.name ? 'tabs__item--active' : ''
                 }`}
                 to="#"
-                onClick={(evt) => {
-                  evt.preventDefault();
-                  onCityClick(city.name);
-                }}
+                onClick={(evt) => handleCityClick(evt, city.name)}
               >
                 <span>{city.name}</span>
               </Link>
@@ -38,4 +44,5 @@ function CitiesList({
   );
 }
 
-export default CitiesList;
+const MemoizedCitiesList = React.memo(CitiesList);
+export default MemoizedCitiesList;

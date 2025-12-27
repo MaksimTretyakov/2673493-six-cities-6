@@ -1,3 +1,4 @@
+import React from 'react';
 import Card from '../card/card';
 import { Offer } from '../../types/offer';
 
@@ -28,4 +29,5 @@ function CardList({
   );
 }
 
-export default CardList;
+const MemoizedCardList = React.memo(CardList);
+export default MemoizedCardList;
